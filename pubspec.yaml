@@ -38,6 +38,7 @@ dependencies:
   url_launcher: ^6.1.2
   marquee: ^2.2.2
   fluttertoast: ^8.0.9
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

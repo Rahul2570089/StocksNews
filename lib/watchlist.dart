@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:marquee/marquee.dart';
 import 'package:newsapp/article2.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,7 +28,7 @@ class _WatchlistState extends State<Watchlist> {
                     child: Marquee(
                       text: a[position].name! == ''
                           ? '  Name Unavailable  '
-                          : a[position].name!,
+                          : "  " + a[position].name! + "  ",
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: a[position].name! == '  Name Unavailable  '
@@ -48,12 +49,11 @@ class _WatchlistState extends State<Watchlist> {
                   },
                   onLongPress: () {
                     setState(() {
-                      a.remove(Article2(
-                          name: a[position].name! == ''
-                              ? '  Name Unavailable  '
-                              : a[position].name!,
-                          symbol: a[position].symbol!));
+                      a.removeAt(position);
                     });
+                    Fluttertoast.showToast(
+                      msg: "Removed from watchlist",
+                      toastLength: Toast.LENGTH_SHORT);
                   },
                 ),
               );

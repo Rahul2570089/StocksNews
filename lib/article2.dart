@@ -7,7 +7,7 @@ class Article2 {
   factory Article2.fromJson(Map json) {
     return Article2(
       name: json["name"],
-      symbol: json["symbol"]
+      symbol: json["symbol"],
     );
   }
 }

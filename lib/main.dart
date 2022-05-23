@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:newsapp/news.dart';
+import 'package:newsapp/localdata/sharedpreferences.dart';
 import 'package:newsapp/stocks.dart';
 import 'package:newsapp/watchlist.dart';
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
      const SystemUiOverlayStyle(
        statusBarColor: Colors.transparent,
        statusBarBrightness: Brightness.light
      )
    );
-  runApp(const MaterialApp(home: MyApp(),debugShowCheckedModeBanner: false,));
+   await UserSimplePreferences.init();
+  runApp(const MaterialApp(home: MyApp(),debugShowCheckedModeBanner: false,title: 'StocksOps',));
 }
 
 class MyApp extends StatefulWidget {
@@ -28,7 +31,16 @@ class _MyAppState extends State<MyApp> {
     const Stocks(),  
     const News(),  
     const Watchlist(), 
-  ];  
+  ];
+
+  List<String> ss = List.generate(2000, (index) => 'false');
+
+  @override
+  void initState() {
+    showcolor = UserSimplePreferences.getColor() ?? ss;
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {

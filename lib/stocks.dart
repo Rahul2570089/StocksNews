@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:marquee/marquee.dart';
+import 'package:newsapp/localdata/sharedpreferences.dart';
 import 'package:newsapp/watchlist.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'article2.dart';
+
+List<String>? showcolor = List.generate(2000, (index) => 'false');
 
 class Stocks extends StatefulWidget {
   const Stocks({Key? key}) : super(key: key);
@@ -18,7 +21,10 @@ class _StocksState extends State<Stocks> {
   List? mapresponse;
   TextEditingController c = TextEditingController();
   List<Article2> list = [];
+  List<Article2> list2 = [];
   List<String> l = [];
+  bool show = false;
+
 
   Future<List<Article2>> apicall() async {
     http.Response response;
@@ -35,7 +41,7 @@ class _StocksState extends State<Stocks> {
     }
     return list;
   }
-
+  
   Widget listview(List<Article2> stocks) {
     return ListView.builder(
         itemCount: stocks.length,
@@ -45,48 +51,62 @@ class _StocksState extends State<Stocks> {
               title: SizedBox(
                 height: 50,
                 width: 90,
-                child: Marquee(
-                  text: stocks[position].name! == ''
-                      ? '  Name Unavailable  '
-                      : stocks[position].name!,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: stocks[position].name! == ''
-                          ? Colors.red
-                          : Colors.black),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Marquee(
+                        text: stocks[position].name! == ''
+                            ? '  Name Unavailable  '
+                            : "  " + stocks[position].name! + "  ",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: stocks[position].name! == ''
+                                ? Colors.red
+                                : Colors.black),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.star,color: showcolor![position]=='true' ?  Colors.yellow : Colors.grey,),
+                      onPressed: () async {
+                        if (l.contains(stocks[position].symbol)) {
+                          Fluttertoast.showToast(
+                              msg: "Already in watchlist",
+                              toastLength: Toast.LENGTH_SHORT);
+                        } else {
+                          setState(() {
+                            a.add(Article2(
+                                name: stocks[position].name! == ''
+                                    ? '  Name Unavailable  '
+                                    : '  ' + stocks[position].name! + '  ',
+                                symbol: stocks[position].symbol!));
+                            l.add(stocks[position].symbol!);
+                            showcolor![position] = 'true';
+                          });
+                          await UserSimplePreferences.setColor(showcolor!);
+
+                          Fluttertoast.showToast(
+                              msg: "Added to watchlist",
+                              toastLength: Toast.LENGTH_SHORT);
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
               leading: Padding(
-                  padding: const EdgeInsets.only(right: 120.0),
+                  padding: const EdgeInsets.only(right: 80.0),
                   child: Text(
                     stocks[position].symbol!,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
                     ),
                   )),
               onTap: () {
-                launchUrl(Uri.parse("https://www.marketwatch.com/investing/stock/${stocks[position].symbol}"));
-              },
-              onLongPress: () {
-                if (l.contains(stocks[position].symbol)) {
-                  Fluttertoast.showToast(
-                      msg: "Already in watchlist",
-                      toastLength: Toast.LENGTH_SHORT);
-                } else {
-                  setState(() {
-                    a.add(Article2(
-                        name: stocks[position].name! == ''
-                            ? '  Name Unavailable  '
-                            : stocks[position].name!,
-                        symbol: stocks[position].symbol!));
-                    l.add(stocks[position].symbol!);
-                    
-                  });
-                  Fluttertoast.showToast(
-                      msg: "Added to watchlist",
-                      toastLength: Toast.LENGTH_SHORT);
-                }
+                launchUrl(Uri.parse(
+                    "https://www.marketwatch.com/investing/stock/${stocks[position].symbol}"));
               },
             ),
           );
@@ -99,38 +119,24 @@ class _StocksState extends State<Stocks> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
-          child: Row(
-            children: [
-              Expanded(
-                  child: TextField(
-                onChanged: ((value) => {
-                      setState(() {
-                        list = list
-                            .where((element) => element.name!.contains(value))
-                            .toList();
-                      })
-                    }),
-                controller: c,
-                decoration: const InputDecoration(
-                  hintText: "Enter stock",
-                  hintStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                  border: InputBorder.none,
-                ),
-              )),
-              SizedBox(
-                height: 40,
-                width: 40,
-                child: FloatingActionButton(
-                  child: const Icon(Icons.search),
-                  onPressed: () {},
-                  backgroundColor: Colors.black,
-                  elevation: 0.0,
-                  highlightElevation: 0.0,
-                ),
+          child: TextField(
+            onChanged: ((value) => {
+                  setState(() {
+                    value = value.toUpperCase();
+                    list2 = list
+                        .where((element) => element.symbol!.contains(value))
+                        .toList();
+                    show = true;
+                  })
+                }),
+            controller: c,
+            decoration: const InputDecoration(
+              hintText: "Enter stock",
+              hintStyle: TextStyle(
+                color: Colors.grey,
               ),
-            ],
+              border: InputBorder.none,
+            ),
           ),
         ),
         const Divider(
@@ -138,13 +144,15 @@ class _StocksState extends State<Stocks> {
           color: Colors.black,
         ),
         Expanded(
-          child: FutureBuilder<List<Article2>>(
-              future: apicall(),
-              builder: (context, snapshot) {
-                return snapshot.data != null
-                    ? listview(snapshot.data!)
-                    : const Center(child: CircularProgressIndicator());
-              }),
+          child: !show
+              ? FutureBuilder<List<Article2>>(
+                  future: apicall(),
+                  builder: (context, snapshot) {
+                    return snapshot.data != null
+                        ? listview(snapshot.data!)
+                        : const Center(child: CircularProgressIndicator());
+                  })
+              : listview(list2),
         ),
       ],
     );
