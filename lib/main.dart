@@ -14,7 +14,7 @@ Future main() async {
      )
    );
    await UserSimplePreferences.init();
-  runApp(const MaterialApp(home: MyApp(),debugShowCheckedModeBanner: false,title: 'StocksOps',));
+  runApp(const MaterialApp(home: MyApp(),debugShowCheckedModeBanner: false,title: 'StockOps',));
 }
 
 class MyApp extends StatefulWidget {
@@ -38,6 +38,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     showcolor = UserSimplePreferences.getColor() ?? ss;
+    n = UserSimplePreferences.getWatchlistName() ?? [];
+    s = UserSimplePreferences.getWatchlistSymbol() ?? [];
     super.initState();
   }
 

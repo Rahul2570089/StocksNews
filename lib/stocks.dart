@@ -22,9 +22,7 @@ class _StocksState extends State<Stocks> {
   TextEditingController c = TextEditingController();
   List<Article2> list = [];
   List<Article2> list2 = [];
-  List<String> l = [];
   bool show = false;
-
 
   Future<List<Article2>> apicall() async {
     http.Response response;
@@ -41,7 +39,7 @@ class _StocksState extends State<Stocks> {
     }
     return list;
   }
-  
+
   Widget listview(List<Article2> stocks) {
     return ListView.builder(
         itemCount: stocks.length,
@@ -69,29 +67,47 @@ class _StocksState extends State<Stocks> {
                       width: 10,
                     ),
                     IconButton(
-                      icon: Icon(Icons.star,color: showcolor![position]=='true' ?  Colors.yellow : Colors.grey,),
-                      onPressed: () async {
-                        if (l.contains(stocks[position].symbol)) {
-                          Fluttertoast.showToast(
-                              msg: "Already in watchlist",
-                              toastLength: Toast.LENGTH_SHORT);
-                        } else {
-                          setState(() {
-                            a.add(Article2(
-                                name: stocks[position].name! == ''
-                                    ? '  Name Unavailable  '
-                                    : '  ' + stocks[position].name! + '  ',
-                                symbol: stocks[position].symbol!));
-                            l.add(stocks[position].symbol!);
-                            showcolor![position] = 'true';
-                          });
-                          await UserSimplePreferences.setColor(showcolor!);
-
-                          Fluttertoast.showToast(
-                              msg: "Added to watchlist",
-                              toastLength: Toast.LENGTH_SHORT);
-                        }
-                      },
+                      icon: Icon(
+                        Icons.star,
+                        color: showcolor![position] == 'true'
+                            ? Colors.yellow
+                            : Colors.grey,
+                      ),
+                      onPressed: showcolor![position] == 'false'
+                          ? () async {
+                              setState(() {
+                                s.add(stocks[position].symbol!);
+                                n.add(
+                                  stocks[position].name! == ''
+                                      ? '  Name Unavailable  '
+                                      : '  ' + stocks[position].name! + '  ',
+                                );
+                                showcolor![position] = 'true';
+                              });
+                              await UserSimplePreferences.setColor(showcolor!);
+                              await UserSimplePreferences.setWatchlistName(n);
+                              await UserSimplePreferences.setWatchlistSymbol(s);
+                              Fluttertoast.showToast(
+                                  msg: "Added to watchlist",
+                                  toastLength: Toast.LENGTH_SHORT);
+                            }
+                          : () async {
+                              setState(() {
+                                int a = n.indexOf(stocks[position].name! == ''
+                                      ? '  Name Unavailable  '
+                                      : '  ' + stocks[position].name! + '  ');
+                                n.removeAt(a);
+                                int b = s.indexOf(stocks[position].symbol!);
+                                s.removeAt(b);
+                                showcolor![position] = 'false';
+                              });
+                              await UserSimplePreferences.setColor(showcolor!);
+                              await UserSimplePreferences.setWatchlistName(n);
+                              await UserSimplePreferences.setWatchlistSymbol(s);
+                              Fluttertoast.showToast(
+                                  msg: "Removed from watchlist",
+                                  toastLength: Toast.LENGTH_SHORT);
+                            },
                     ),
                   ],
                 ),
@@ -125,6 +141,8 @@ class _StocksState extends State<Stocks> {
                     value = value.toUpperCase();
                     list2 = list
                         .where((element) => element.symbol!.contains(value))
+                        .toList() + list
+                        .where((element) => element.name!.contains(value))
                         .toList();
                     show = true;
                   })
@@ -150,7 +168,10 @@ class _StocksState extends State<Stocks> {
                   builder: (context, snapshot) {
                     return snapshot.data != null
                         ? listview(snapshot.data!)
-                        : const Center(child: CircularProgressIndicator());
+                        : const Center(
+                            child: CircularProgressIndicator(
+                            color: Colors.black,
+                          ));
                   })
               : listview(list2),
         ),

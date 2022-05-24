@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:marquee/marquee.dart';
-import 'package:newsapp/article2.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-List<Article2> a = [];
+List<String> n = [];
+List<String> s = [];
 
 class Watchlist extends StatefulWidget {
   const Watchlist({Key? key}) : super(key: key);
@@ -17,46 +16,45 @@ class _WatchlistState extends State<Watchlist> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: a.isNotEmpty ? ListView.builder(
-            itemCount: a.length,
-            itemBuilder: (context, position) {
-              return Card(
-                child: ListTile(
-                  title: SizedBox(
-                    height: 30,
-                    width: 90,
-                    child: Marquee(
-                      text: a[position].name! == ''
-                          ? '  Name Unavailable  '
-                          : "  " + a[position].name! + "  ",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: a[position].name! == '  Name Unavailable  '
-                              ? Colors.red
-                              : Colors.black),
-                    ),
-                  ),
-                  leading: Padding(
-                      padding: const EdgeInsets.only(right: 120.0),
-                      child: Text(
-                        a[position].symbol!,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+        body: n.isNotEmpty
+            ? ListView.builder(
+                itemCount: n.length,
+                itemBuilder: (context, position) {
+                  return Card(
+                    child: ListTile(
+                      title: SizedBox(
+                        height: 30,
+                        width: 90,
+                        child: Marquee(
+                          text: n[position] == ''
+                              ? '  Name Unavailable  '
+                              : "  " + n[position] + "  ",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: n[position] == '  Name Unavailable  '
+                                  ? Colors.red
+                                  : Colors.black),
                         ),
-                      )),
-                  onTap: () {
-                    launchUrl(Uri.parse("https://www.marketwatch.com/investing/stock/${a[position].symbol}"));
-                  },
-                  onLongPress: () {
-                    setState(() {
-                      a.removeAt(position);
-                    });
-                    Fluttertoast.showToast(
-                      msg: "Removed from watchlist",
-                      toastLength: Toast.LENGTH_SHORT);
-                  },
-                ),
-              );
-            }) : const Center(child: Text('Watchlist is Empty',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30),)));
+                      ),
+                      leading: Padding(
+                          padding: const EdgeInsets.only(right: 120.0),
+                          child: Text(
+                            s[position],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )),
+                      onTap: () {
+                        launchUrl(Uri.parse(
+                            "https://www.marketwatch.com/investing/stock/${s[position]}"));
+                      },
+                    ),
+                  );
+                })
+            : const Center(
+                child: Text(
+                'Watchlist is Empty',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              )));
   }
 }

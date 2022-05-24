@@ -76,7 +76,7 @@ class _NewsState extends State<News> {
           return snapshot.data != null
               ? listview(snapshot.data!)
               : const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(color: Colors.black,),
                 );
         });
   }
