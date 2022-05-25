@@ -8,7 +8,9 @@ import 'package:newsapp/watchlist.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'article2.dart';
 
-List<String>? showcolor = List.generate(2000, (index) => 'false');
+Map<String, String> m = {};
+List<String> showsymbol = [];
+List<String> showcolor = [];
 
 class Stocks extends StatefulWidget {
   const Stocks({Key? key}) : super(key: key);
@@ -69,11 +71,13 @@ class _StocksState extends State<Stocks> {
                     IconButton(
                       icon: Icon(
                         Icons.star,
-                        color: showcolor![position] == 'true'
+                        color: m[stocks[position].symbol!] == 'true'
                             ? Colors.yellow
                             : Colors.grey,
                       ),
-                      onPressed: showcolor![position] == 'false'
+                      onPressed: (m.containsKey(stocks[position].symbol!) &&
+                                  m[stocks[position].symbol!] == '') ||
+                              !m.containsKey(stocks[position].symbol!)
                           ? () async {
                               setState(() {
                                 s.add(stocks[position].symbol!);
@@ -82,9 +86,16 @@ class _StocksState extends State<Stocks> {
                                       ? '  Name Unavailable  '
                                       : '  ' + stocks[position].name! + '  ',
                                 );
-                                showcolor![position] = 'true';
+                                m[stocks[position].symbol!] = 'true';
                               });
-                              await UserSimplePreferences.setColor(showcolor!);
+                              m.forEach((key, value) {
+                                showsymbol.add(key);
+                              });
+                              m.forEach((key, value) {
+                                showcolor.add(value);
+                              });
+                              await UserSimplePreferences.setSymbol(showsymbol);
+                              await UserSimplePreferences.setColor(showcolor);
                               await UserSimplePreferences.setWatchlistName(n);
                               await UserSimplePreferences.setWatchlistSymbol(s);
                               Fluttertoast.showToast(
@@ -94,14 +105,21 @@ class _StocksState extends State<Stocks> {
                           : () async {
                               setState(() {
                                 int a = n.indexOf(stocks[position].name! == ''
-                                      ? '  Name Unavailable  '
-                                      : '  ' + stocks[position].name! + '  ');
+                                    ? '  Name Unavailable  '
+                                    : '  ' + stocks[position].name! + '  ');
                                 n.removeAt(a);
                                 int b = s.indexOf(stocks[position].symbol!);
                                 s.removeAt(b);
-                                showcolor![position] = 'false';
+                                m[stocks[position].symbol!] = 'false';
                               });
-                              await UserSimplePreferences.setColor(showcolor!);
+                              m.forEach((key, value) {
+                                showsymbol.add(key);
+                              });
+                              m.forEach((key, value) {
+                                showcolor.add(value);
+                              });
+                              await UserSimplePreferences.setSymbol(showsymbol);
+                              await UserSimplePreferences.setColor(showcolor);
                               await UserSimplePreferences.setWatchlistName(n);
                               await UserSimplePreferences.setWatchlistSymbol(s);
                               Fluttertoast.showToast(
@@ -140,10 +158,11 @@ class _StocksState extends State<Stocks> {
                   setState(() {
                     value = value.toUpperCase();
                     list2 = list
-                        .where((element) => element.symbol!.contains(value))
-                        .toList() + list
-                        .where((element) => element.name!.contains(value))
-                        .toList();
+                            .where((element) => element.symbol!.contains(value))
+                            .toList() +
+                        list
+                            .where((element) => element.name!.contains(value))
+                            .toList();
                     show = true;
                   })
                 }),
