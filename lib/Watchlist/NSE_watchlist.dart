@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
+import 'package:newsapp/Stockslist/Bse.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 List<String> n = [];
@@ -45,8 +46,14 @@ class _WatchlistState extends State<Watchlist> {
                             ),
                           )),
                       onTap: () {
+                        int i;
+                        for(i=0; i<m3!.length; i++) {
+                          if(m3![i].symbol == s[position]) {
+                            break;
+                          }
+                        }
                         launchUrl(Uri.parse(
-                            "https://www.marketwatch.com/investing/stock/${s[position]}"));
+                            "https://www.google.com/finance/quote/${m3![i].symbol}:NSE"));
                       },
                     ),
                   );
