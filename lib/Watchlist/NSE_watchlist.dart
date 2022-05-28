@@ -46,14 +46,8 @@ class _WatchlistState extends State<Watchlist> {
                             ),
                           )),
                       onTap: () {
-                        int i;
-                        for(i=0; i<m3!.length; i++) {
-                          if(m3![i].symbol == s[position]) {
-                            break;
-                          }
-                        }
                         launchUrl(Uri.parse(
-                            "https://www.google.com/finance/quote/${m3![i].symbol}:NSE"));
+                            "https://www.google.com/finance/quote/${s[position]}:NSE"));
                       },
                     ),
                   );
