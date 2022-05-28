@@ -4,9 +4,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:marquee/marquee.dart';
 import 'package:newsapp/localdata/sharedpreferences.dart';
-import 'package:newsapp/watchlist.dart';
+import 'package:newsapp/Watchlist/NSE_watchlist.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'article2.dart';
+import '../Models/article2.dart';
 
 Map<String, String> m = {};
 List<String> showsymbol = [];
@@ -25,11 +25,12 @@ class _StocksState extends State<Stocks> {
   List<Article2> list = [];
   List<Article2> list2 = [];
   bool show = false;
+  TabController? tabController;
 
   Future<List<Article2>> apicall() async {
     http.Response response;
     response = await http
-        .get(Uri.parse("https://iextrading.com/api/1.0/ref-data/symbols"));
+        .get(Uri.parse("https://rahul2570089.github.io/jsonAPI/NSE_stocks.json"));
     if (response.statusCode == 200) {
       if (mounted) {
         setState(() {
@@ -75,9 +76,7 @@ class _StocksState extends State<Stocks> {
                             ? Colors.yellow
                             : Colors.grey,
                       ),
-                      onPressed: (m.containsKey(stocks[position].symbol!) &&
-                                  m[stocks[position].symbol!] == '') ||
-                              !m.containsKey(stocks[position].symbol!)
+                      onPressed: (!n.contains(stocks[position].name) && !s.contains(stocks[position].symbol))
                           ? () async {
                               setState(() {
                                 s.add(stocks[position].symbol!);
@@ -140,7 +139,7 @@ class _StocksState extends State<Stocks> {
                   )),
               onTap: () {
                 launchUrl(Uri.parse(
-                    "https://www.marketwatch.com/investing/stock/${stocks[position].symbol}"));
+                    "https://www.google.com/finance/quote/${stocks[position].symbol}:NSE"));
               },
             ),
           );
@@ -150,51 +149,48 @@ class _StocksState extends State<Stocks> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
-          child: TextField(
-            onChanged: ((value) => {
-                  setState(() {
-                    value = value.toUpperCase();
-                    list2 = list
-                            .where((element) => element.symbol!.contains(value))
-                            .toList() +
-                        list
-                            .where((element) => element.name!.contains(value))
-                            .toList();
-                    show = true;
-                  })
-                }),
-            controller: c,
-            decoration: const InputDecoration(
-              hintText: "Enter stock",
-              hintStyle: TextStyle(
-                color: Colors.grey,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+            child: TextField(
+              onChanged: ((value) => {
+                    setState(() {
+                      value = value.toUpperCase();
+                      list2 = list
+                              .where((element) => element.symbol!.contains(value))
+                              .toList();
+                      show = true;
+                    })
+                  }),
+              controller: c,
+              decoration: const InputDecoration(
+                hintText: "Enter stock",
+                hintStyle: TextStyle(
+                  color: Colors.grey,
+                ),
+                border: InputBorder.none,
               ),
-              border: InputBorder.none,
             ),
           ),
-        ),
-        const Divider(
-          thickness: 0.6,
-          color: Colors.black,
-        ),
-        Expanded(
-          child: !show
-              ? FutureBuilder<List<Article2>>(
-                  future: apicall(),
-                  builder: (context, snapshot) {
-                    return snapshot.data != null
-                        ? listview(snapshot.data!)
-                        : const Center(
-                            child: CircularProgressIndicator(
-                            color: Colors.black,
-                          ));
-                  })
-              : listview(list2),
-        ),
-      ],
-    );
+          const Divider(
+            thickness: 0.6,
+            color: Colors.black,
+          ),
+          Expanded(
+            child: !show
+                ? FutureBuilder<List<Article2>>(
+                    future: apicall(),
+                    builder: (context, snapshot) {
+                      return snapshot.data != null
+                          ? listview(snapshot.data!)
+                          : const Center(
+                              child: CircularProgressIndicator(
+                              color: Colors.black,
+                            ));
+                    })
+                : listview(list2),
+          ),
+        ],
+      );
   }
 }
