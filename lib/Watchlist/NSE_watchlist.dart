@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
-import 'package:newsapp/Stockslist/Bse.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 List<String> n = [];
