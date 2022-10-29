@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:marquee/marquee.dart';
-import 'package:newsapp/localdata/sharedpreferences.dart';
-import 'package:newsapp/Watchlist/NSE_watchlist.dart';
+import 'package:newsapp/controllers/nse_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Models/article2.dart';
 
@@ -20,6 +20,8 @@ class Stocks extends StatefulWidget {
 }
 
 class _StocksState extends State<Stocks> {
+  NSEcontroller nsecontroller = Get.put(NSEcontroller());
+
   List? mapresponse;
   TextEditingController c = TextEditingController();
   List<Article2> list = [];
@@ -29,8 +31,8 @@ class _StocksState extends State<Stocks> {
 
   Future<List<Article2>> apicall() async {
     http.Response response;
-    response = await http
-        .get(Uri.parse("https://rahul2570089.github.io/jsonAPI/NSE_stocks.json"));
+    response = await http.get(
+        Uri.parse("https://rahul2570089.github.io/jsonAPI/NSE_stocks.json"));
     if (response.statusCode == 200) {
       if (mounted) {
         setState(() {
@@ -69,62 +71,39 @@ class _StocksState extends State<Stocks> {
                     const SizedBox(
                       width: 10,
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.star,
-                        color: m[stocks[position].symbol!] == 'true'
-                            ? Colors.yellow
-                            : Colors.grey,
+                    Obx(
+                      () => IconButton(
+                        icon: Icon(
+                          Icons.star,
+                          color: nsecontroller.m[stocks[position].symbol!] ==
+                                  'true'
+                              ? Colors.yellow
+                              : Colors.grey,
+                        ),
+                        onPressed:
+                            (!nsecontroller.n.contains(stocks[position].name) &&
+                                    !nsecontroller.s
+                                        .contains(stocks[position].symbol))
+                                ? () async {
+                                    setState(() {
+                                      nsecontroller.addToWatchlist(
+                                          stocks, position);
+                                    });
+
+                                    Fluttertoast.showToast(
+                                        msg: "Added to watchlist",
+                                        toastLength: Toast.LENGTH_SHORT);
+                                  }
+                                : () async {
+                                    setState(() {
+                                      nsecontroller.removeFromWatchlist(
+                                          stocks, position);
+                                    });
+                                    Fluttertoast.showToast(
+                                        msg: "Removed from watchlist",
+                                        toastLength: Toast.LENGTH_SHORT);
+                                  },
                       ),
-                      onPressed: (!n.contains(stocks[position].name) && !s.contains(stocks[position].symbol))
-                          ? () async {
-                              setState(() {
-                                s.add(stocks[position].symbol!);
-                                n.add(
-                                  stocks[position].name! == ''
-                                      ? '  Name Unavailable  '
-                                      : '  ' + stocks[position].name! + '  ',
-                                );
-                                m[stocks[position].symbol!] = 'true';
-                              });
-                              m.forEach((key, value) {
-                                showsymbol.add(key);
-                              });
-                              m.forEach((key, value) {
-                                showcolor.add(value);
-                              });
-                              await UserSimplePreferences.setSymbol(showsymbol);
-                              await UserSimplePreferences.setColor(showcolor);
-                              await UserSimplePreferences.setWatchlistName(n);
-                              await UserSimplePreferences.setWatchlistSymbol(s);
-                              Fluttertoast.showToast(
-                                  msg: "Added to watchlist",
-                                  toastLength: Toast.LENGTH_SHORT);
-                            }
-                          : () async {
-                              setState(() {
-                                int a = n.indexOf(stocks[position].name! == ''
-                                    ? '  Name Unavailable  '
-                                    : '  ' + stocks[position].name! + '  ');
-                                n.removeAt(a);
-                                int b = s.indexOf(stocks[position].symbol!);
-                                s.removeAt(b);
-                                m[stocks[position].symbol!] = 'false';
-                              });
-                              m.forEach((key, value) {
-                                showsymbol.add(key);
-                              });
-                              m.forEach((key, value) {
-                                showcolor.add(value);
-                              });
-                              await UserSimplePreferences.setSymbol(showsymbol);
-                              await UserSimplePreferences.setColor(showcolor);
-                              await UserSimplePreferences.setWatchlistName(n);
-                              await UserSimplePreferences.setWatchlistSymbol(s);
-                              Fluttertoast.showToast(
-                                  msg: "Removed from watchlist",
-                                  toastLength: Toast.LENGTH_SHORT);
-                            },
                     ),
                   ],
                 ),
@@ -149,48 +128,48 @@ class _StocksState extends State<Stocks> {
   @override
   Widget build(BuildContext context) {
     return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
-            child: TextField(
-              onChanged: ((value) => {
-                    setState(() {
-                      value = value.toUpperCase();
-                      list2 = list
-                              .where((element) => element.symbol!.contains(value))
-                              .toList();
-                      show = true;
-                    })
-                  }),
-              controller: c,
-              decoration: const InputDecoration(
-                hintText: "Enter stock",
-                hintStyle: TextStyle(
-                  color: Colors.grey,
-                ),
-                border: InputBorder.none,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+          child: TextField(
+            onChanged: ((value) => {
+                  setState(() {
+                    value = value.toUpperCase();
+                    list2 = list
+                        .where((element) => element.symbol!.contains(value))
+                        .toList();
+                    show = true;
+                  })
+                }),
+            controller: c,
+            decoration: const InputDecoration(
+              hintText: "Enter stock",
+              hintStyle: TextStyle(
+                color: Colors.grey,
               ),
+              border: InputBorder.none,
             ),
           ),
-          const Divider(
-            thickness: 0.6,
-            color: Colors.black,
-          ),
-          Expanded(
-            child: !show
-                ? FutureBuilder<List<Article2>>(
-                    future: apicall(),
-                    builder: (context, snapshot) {
-                      return snapshot.data != null
-                          ? listview(snapshot.data!)
-                          : const Center(
-                              child: CircularProgressIndicator(
-                              color: Colors.black,
-                            ));
-                    })
-                : listview(list2),
-          ),
-        ],
-      );
+        ),
+        const Divider(
+          thickness: 0.6,
+          color: Colors.black,
+        ),
+        Expanded(
+          child: !show
+              ? FutureBuilder<List<Article2>>(
+                  future: apicall(),
+                  builder: (context, snapshot) {
+                    return snapshot.data != null
+                        ? listview(snapshot.data!)
+                        : const Center(
+                            child: CircularProgressIndicator(
+                            color: Colors.black,
+                          ));
+                  })
+              : listview(list2),
+        ),
+      ],
+    );
   }
 }

@@ -1,17 +1,17 @@
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
 import 'package:newsapp/Models/article2.dart';
-import 'package:newsapp/Watchlist/BSE_watchlist.dart';
-import 'package:newsapp/localdata/sharedpreferences.dart';
+import 'package:newsapp/controllers/bse_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Map<String, String> m1 = {};
 List<String> showsymbol1 = [];
 List<String> showcolor1 = [];
-List<Article2>? m3; 
+List<Article2>? m3;
 
 class BSE extends StatefulWidget {
   const BSE({Key? key}) : super(key: key);
@@ -21,6 +21,10 @@ class BSE extends StatefulWidget {
 }
 
 class _BSEState extends State<BSE> {
+
+  BSEcontroller bsecontroller = Get.put(BSEcontroller());
+
+
   List? mapresponse;
   TextEditingController c = TextEditingController();
   List<Article2> list = [];
@@ -71,62 +75,32 @@ class _BSEState extends State<BSE> {
                     const SizedBox(
                       width: 10,
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.star,
-                        color: m1[stocks[position].symbol!] == 'true'
-                            ? Colors.yellow
-                            : Colors.grey,
+                    Obx(
+                      () => IconButton(
+                        icon: Icon(
+                          Icons.star,
+                          color: bsecontroller.m[stocks[position].symbol!] == 'true'
+                              ? Colors.yellow
+                              : Colors.grey,
+                        ),
+                        onPressed: (!bsecontroller.n.contains(stocks[position].name) && !bsecontroller.s.contains(stocks[position].symbol))
+                            ? () async {
+                                setState(() {
+                                  bsecontroller.addToWatchlist(stocks, position);
+                                });
+                                Fluttertoast.showToast(
+                                    msg: "Added to watchlist",
+                                    toastLength: Toast.LENGTH_SHORT);
+                              }
+                            : () async {
+                                setState(() {
+                                  bsecontroller.removeFromWatchlist(stocks, position);
+                                });
+                                Fluttertoast.showToast(
+                                    msg: "Removed from watchlist",
+                                    toastLength: Toast.LENGTH_SHORT);
+                              },
                       ),
-                      onPressed: (!n1.contains(stocks[position].name) && !s1.contains(stocks[position].symbol))
-                          ? () async {
-                              setState(() {
-                                s1.add(stocks[position].symbol!);
-                                n1.add(
-                                  stocks[position].name! == ''
-                                      ? '  Name Unavailable  '
-                                      : '  ' + stocks[position].name! + '  ',
-                                );
-                                m1[stocks[position].symbol!] = 'true';
-                              });
-                              m1.forEach((key, value) {
-                                showsymbol1.add(key);
-                              });
-                              m1.forEach((key, value) {
-                                showcolor1.add(value);
-                              });
-                              await UserSimplePreferences.setSymbol1(showsymbol1);
-                              await UserSimplePreferences.setColor1(showcolor1);
-                              await UserSimplePreferences.setWatchlistName1(n1);
-                              await UserSimplePreferences.setWatchlistSymbol1(s1);
-                              Fluttertoast.showToast(
-                                  msg: "Added to watchlist",
-                                  toastLength: Toast.LENGTH_SHORT);
-                            }
-                          : () async {
-                              setState(() {
-                                int a = n1.indexOf(stocks[position].name! == ''
-                                    ? '  Name Unavailable  '
-                                    : '  ' + stocks[position].name! + '  ');
-                                n1.removeAt(a);
-                                int b = s1.indexOf(stocks[position].symbol!);
-                                s1.removeAt(b);
-                                m1[stocks[position].symbol!] = 'false';
-                              });
-                              m1.forEach((key, value) {
-                                showsymbol1.add(key);
-                              });
-                              m1.forEach((key, value) {
-                                showcolor1.add(value);
-                              });
-                              await UserSimplePreferences.setSymbol1(showsymbol1);
-                              await UserSimplePreferences.setColor1(showcolor1);
-                              await UserSimplePreferences.setWatchlistName1(n1);
-                              await UserSimplePreferences.setWatchlistSymbol1(s1);
-                              Fluttertoast.showToast(
-                                  msg: "Removed from watchlist",
-                                  toastLength: Toast.LENGTH_SHORT);
-                            },
                     ),
                   ],
                 ),

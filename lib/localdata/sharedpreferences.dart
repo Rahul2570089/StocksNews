@@ -1,3 +1,4 @@
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserSimplePreferences {
@@ -16,19 +17,19 @@ class UserSimplePreferences {
     _preferences = await SharedPreferences.getInstance();
   }
 
-  static Future setSymbol(List<String> s) async {
+  static Future setSymbol(RxList<String> s) async {
     await _preferences?.setStringList(_keyS, s);
   }
 
-  static Future setSymbol1(List<String> s) async {
+  static Future setSymbol1(RxList<String> s) async {
     await _preferences?.setStringList(_keyS1, s);
   }
 
-  static Future setColor(List<String> s) async {
+  static Future setColor(RxList<String> s) async {
     await _preferences?.setStringList(_keyC, s);
   }
 
-  static Future setColor1(List<String> s) async {
+  static Future setColor1(RxList<String> s) async {
     await _preferences?.setStringList(_keyC1, s);
   }
 
@@ -48,7 +49,7 @@ class UserSimplePreferences {
     return _preferences?.getStringList(_keyC1);
   }
 
-  static Future setWatchlistName(List<String> n) async {
+  static Future setWatchlistName(RxList<String> n) async {
     return _preferences?.setStringList(_key2, n);
   }
 
@@ -56,7 +57,7 @@ class UserSimplePreferences {
     return _preferences?.getStringList(_key2);
   }
 
-  static Future setWatchlistName1(List<String> s) async {
+  static Future setWatchlistName1(RxList<String> s) async {
     await _preferences?.setStringList(_key4, s);
   }
 
@@ -64,7 +65,7 @@ class UserSimplePreferences {
     return _preferences?.getStringList(_key4);
   }
 
-  static Future setWatchlistSymbol(List<String> s) async {
+  static Future setWatchlistSymbol(RxList<String> s) async {
     return _preferences?.setStringList(_key3, s);
   }
 
@@ -72,7 +73,7 @@ class UserSimplePreferences {
     return _preferences?.getStringList(_key3);
   }
 
-  static Future setWatchlistSymbol1(List<String> s) async {
+  static Future setWatchlistSymbol1(RxList<String> s) async {
     return _preferences?.setStringList(_key5, s);
   }
 

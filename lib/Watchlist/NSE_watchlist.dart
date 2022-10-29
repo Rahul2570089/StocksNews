@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:marquee/marquee.dart';
+import 'package:newsapp/controllers/nse_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 List<String> n = [];
@@ -13,40 +15,45 @@ class Watchlist extends StatefulWidget {
 }
 
 class _WatchlistState extends State<Watchlist> {
+
+  NSEcontroller nsecontroller = Get.put(NSEcontroller());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: n.isNotEmpty
+        body: nsecontroller.n.isNotEmpty
             ? ListView.builder(
-                itemCount: n.length,
+                itemCount: nsecontroller.n.length,
                 itemBuilder: (context, position) {
                   return Card(
                     child: ListTile(
-                      title: SizedBox(
-                        height: 30,
-                        width: 90,
-                        child: Marquee(
-                          text: n[position] == ''
-                              ? '  Name Unavailable  '
-                              : "  " + n[position] + "  ",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: n[position] == '  Name Unavailable  '
-                                  ? Colors.red
-                                  : Colors.black),
+                      title: Obx(
+                        () => SizedBox(
+                          height: 30,
+                          width: 90,
+                          child: Marquee(
+                            text: nsecontroller.n[position] == ''
+                                ? '  Name Unavailable  '
+                                : "  " + nsecontroller.n[position] + "  ",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: nsecontroller.n[position] == '  Name Unavailable  '
+                                    ? Colors.red
+                                    : Colors.black),
+                          ),
                         ),
                       ),
                       leading: Padding(
                           padding: const EdgeInsets.only(right: 120.0),
                           child: Text(
-                            s[position],
+                            nsecontroller.s[position],
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           )),
                       onTap: () {
                         launchUrl(Uri.parse(
-                            "https://www.google.com/finance/quote/${s[position]}:NSE"));
+                            "https://www.google.com/finance/quote/${nsecontroller.s[position]}:NSE"));
                       },
                     ),
                   );

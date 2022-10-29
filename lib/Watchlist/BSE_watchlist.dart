@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:marquee/marquee.dart';
-import 'package:newsapp/Stockslist/Bse.dart';
+import 'package:newsapp/Stockslist/bse.dart';
+import 'package:newsapp/controllers/bse_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 List<String> n1 = [];
@@ -15,12 +17,15 @@ class BSEWatchlist extends StatefulWidget {
 }
 
 class _WatchlistState extends State<BSEWatchlist> {
+
+  BSEcontroller bsecontroller = Get.put(BSEcontroller());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: n1.isNotEmpty
+        body: bsecontroller.n.isNotEmpty
             ? ListView.builder(
-                itemCount: n1.length,
+                itemCount: bsecontroller.n.length,
                 itemBuilder: (context, position) {
                   return Card(
                     child: ListTile(
@@ -28,12 +33,12 @@ class _WatchlistState extends State<BSEWatchlist> {
                         height: 30,
                         width: 90,
                         child: Marquee(
-                          text: n1[position] == ''
+                          text: bsecontroller.n[position] == ''
                               ? '  Name Unavailable  '
-                              : "  " + n1[position] + "  ",
+                              : "  " + bsecontroller.n[position] + "  ",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: n1[position] == '  Name Unavailable  '
+                              color: bsecontroller.n[position] == '  Name Unavailable  '
                                   ? Colors.red
                                   : Colors.black),
                         ),
@@ -41,7 +46,7 @@ class _WatchlistState extends State<BSEWatchlist> {
                       leading: Padding(
                           padding: const EdgeInsets.only(right: 120.0),
                           child: Text(
-                            s1[position],
+                            bsecontroller.s[position],
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
@@ -49,7 +54,7 @@ class _WatchlistState extends State<BSEWatchlist> {
                       onTap: () {
                         int i;
                         for(i=0; i<m3!.length; i++) {
-                          if(m3![i].symbol == s1[position]) {
+                          if(m3![i].symbol == bsecontroller.s[position]) {
                             break;
                           }
                         }
