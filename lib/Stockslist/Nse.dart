@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:marquee/marquee.dart';
-import 'package:newsapp/localdata/sharedpreferences.dart';
-import 'package:newsapp/watchlist.dart';
+import 'package:newsapp/controllers/nse_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'article2.dart';
+import '../Models/article2.dart';
 
 Map<String, String> m = {};
 List<String> showsymbol = [];
@@ -20,16 +20,19 @@ class Stocks extends StatefulWidget {
 }
 
 class _StocksState extends State<Stocks> {
+  NSEcontroller nsecontroller = Get.put(NSEcontroller());
+
   List? mapresponse;
   TextEditingController c = TextEditingController();
   List<Article2> list = [];
   List<Article2> list2 = [];
   bool show = false;
+  TabController? tabController;
 
   Future<List<Article2>> apicall() async {
     http.Response response;
-    response = await http
-        .get(Uri.parse("https://iextrading.com/api/1.0/ref-data/symbols"));
+    response = await http.get(
+        Uri.parse("https://rahul2570089.github.io/jsonAPI/NSE_stocks.json"));
     if (response.statusCode == 200) {
       if (mounted) {
         setState(() {
@@ -68,64 +71,39 @@ class _StocksState extends State<Stocks> {
                     const SizedBox(
                       width: 10,
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.star,
-                        color: m[stocks[position].symbol!] == 'true'
-                            ? Colors.yellow
-                            : Colors.grey,
+                    Obx(
+                      () => IconButton(
+                        icon: Icon(
+                          Icons.star,
+                          color: nsecontroller.m[stocks[position].symbol!] ==
+                                  'true'
+                              ? Colors.yellow
+                              : Colors.grey,
+                        ),
+                        onPressed:
+                            (!nsecontroller.n.contains(stocks[position].name) &&
+                                    !nsecontroller.s
+                                        .contains(stocks[position].symbol))
+                                ? () async {
+                                    setState(() {
+                                      nsecontroller.addToWatchlist(
+                                          stocks, position);
+                                    });
+
+                                    Fluttertoast.showToast(
+                                        msg: "Added to watchlist",
+                                        toastLength: Toast.LENGTH_SHORT);
+                                  }
+                                : () async {
+                                    setState(() {
+                                      nsecontroller.removeFromWatchlist(
+                                          stocks, position);
+                                    });
+                                    Fluttertoast.showToast(
+                                        msg: "Removed from watchlist",
+                                        toastLength: Toast.LENGTH_SHORT);
+                                  },
                       ),
-                      onPressed: (m.containsKey(stocks[position].symbol!) &&
-                                  m[stocks[position].symbol!] == '') ||
-                              !m.containsKey(stocks[position].symbol!)
-                          ? () async {
-                              setState(() {
-                                s.add(stocks[position].symbol!);
-                                n.add(
-                                  stocks[position].name! == ''
-                                      ? '  Name Unavailable  '
-                                      : '  ' + stocks[position].name! + '  ',
-                                );
-                                m[stocks[position].symbol!] = 'true';
-                              });
-                              m.forEach((key, value) {
-                                showsymbol.add(key);
-                              });
-                              m.forEach((key, value) {
-                                showcolor.add(value);
-                              });
-                              await UserSimplePreferences.setSymbol(showsymbol);
-                              await UserSimplePreferences.setColor(showcolor);
-                              await UserSimplePreferences.setWatchlistName(n);
-                              await UserSimplePreferences.setWatchlistSymbol(s);
-                              Fluttertoast.showToast(
-                                  msg: "Added to watchlist",
-                                  toastLength: Toast.LENGTH_SHORT);
-                            }
-                          : () async {
-                              setState(() {
-                                int a = n.indexOf(stocks[position].name! == ''
-                                    ? '  Name Unavailable  '
-                                    : '  ' + stocks[position].name! + '  ');
-                                n.removeAt(a);
-                                int b = s.indexOf(stocks[position].symbol!);
-                                s.removeAt(b);
-                                m[stocks[position].symbol!] = 'false';
-                              });
-                              m.forEach((key, value) {
-                                showsymbol.add(key);
-                              });
-                              m.forEach((key, value) {
-                                showcolor.add(value);
-                              });
-                              await UserSimplePreferences.setSymbol(showsymbol);
-                              await UserSimplePreferences.setColor(showcolor);
-                              await UserSimplePreferences.setWatchlistName(n);
-                              await UserSimplePreferences.setWatchlistSymbol(s);
-                              Fluttertoast.showToast(
-                                  msg: "Removed from watchlist",
-                                  toastLength: Toast.LENGTH_SHORT);
-                            },
                     ),
                   ],
                 ),
@@ -140,7 +118,7 @@ class _StocksState extends State<Stocks> {
                   )),
               onTap: () {
                 launchUrl(Uri.parse(
-                    "https://www.marketwatch.com/investing/stock/${stocks[position].symbol}"));
+                    "https://www.google.com/finance/quote/${stocks[position].symbol}:NSE"));
               },
             ),
           );
@@ -158,11 +136,8 @@ class _StocksState extends State<Stocks> {
                   setState(() {
                     value = value.toUpperCase();
                     list2 = list
-                            .where((element) => element.symbol!.contains(value))
-                            .toList() +
-                        list
-                            .where((element) => element.name!.contains(value))
-                            .toList();
+                        .where((element) => element.symbol!.contains(value))
+                        .toList();
                     show = true;
                   })
                 }),

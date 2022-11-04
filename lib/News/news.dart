@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:newsapp/article.dart';
+import 'package:newsapp/Models/article.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class News extends StatefulWidget {
@@ -18,7 +18,7 @@ class _NewsState extends State<News> {
     List<Article> list = [];
     http.Response response;
     response = await http.get(Uri.parse(
-        "https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=d8344f148be2417e837ab60a95d03be9"));
+        "https://newsapi.org/v2/top-headlines?country=in&category=business&apiKey=d8344f148be2417e837ab60a95d03be9"));
     if (response.statusCode == 200) {
       if (mounted) {
         setState(() {
