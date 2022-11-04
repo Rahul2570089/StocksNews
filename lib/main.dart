@@ -19,11 +19,7 @@ Future main() async {
   runApp(const MaterialApp(
     home: MyApp(),
     debugShowCheckedModeBanner: false,
-<<<<<<< HEAD
-    title: 'StockOps-US STOCKS AND NEWS',
-=======
     title: 'StockOps-INDIAN STOCKS AND NEWS',
->>>>>>> 77a7b50861bb826ea121e9ec56539b844ce74041
   ));
 }
 
