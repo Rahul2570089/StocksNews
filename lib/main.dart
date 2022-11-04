@@ -14,7 +14,7 @@ Future main() async {
   runApp(const MaterialApp(
     home: MyApp(),
     debugShowCheckedModeBanner: false,
-    title: 'StockOps',
+    title: 'StockOps-US STOCKS AND NEWS',
   ));
 }
 
