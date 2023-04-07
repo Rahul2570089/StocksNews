@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:newsapp/auth/loginuser_page.dart';
 import 'package:newsapp/auth/usercontroller.dart';
 import 'package:newsapp/homepage.dart';
 
-class CreateUserPage extends StatefulWidget {
-  const CreateUserPage({Key? key}) : super(key: key);
+class LoginUserPage extends StatefulWidget {
+  const LoginUserPage({Key? key}) : super(key: key);
 
   @override
-  State<CreateUserPage> createState() => _CreateUserPageState();
+  State<LoginUserPage> createState() => _LoginUserPageState();
 }
 
-class _CreateUserPageState extends State<CreateUserPage> {
+class _LoginUserPageState extends State<LoginUserPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final _key = GlobalKey<FormState>();
@@ -20,7 +19,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create User'),
+        title: const Text('Login User'),
         backgroundColor: Colors.black,
       ),
       body: isLoading
@@ -89,14 +88,15 @@ class _CreateUserPageState extends State<CreateUserPage> {
                             setState(() {
                               isLoading = true;
                             });
-                            var user = await UserController.createUser(
+                            var user = await UserController.loginUser(
                                 emailController.text, passwordController.text);
                             if (user.email != null) {
-                              Navigator.pushReplacement(
+                              Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => HomePage(
-                                          email: emailController.text)));
+                                          email: emailController.text)),
+                                  (route) => false);
                               setState(
                                 () => isLoading = false,
                               );
@@ -107,7 +107,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text(
-                                          'Something went wrong...User not created...')));
+                                          'Something went wrong... Please try again...')));
                             }
                           }
                         },
@@ -120,25 +120,8 @@ class _CreateUserPageState extends State<CreateUserPage> {
                             shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20)))),
-                        child: const Text('Create User'),
+                        child: const Text('Login'),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginUserPage()));
-                      },
-                      style: ButtonStyle(
-                          shadowColor:
-                              MaterialStateProperty.all(Colors.transparent),
-                          elevation: MaterialStateProperty.all(0),
-                          shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)))),
-                      child: const Text('Login'),
                     ),
                   ],
                 ),

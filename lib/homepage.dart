@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:newsapp/Stockslist/bse.dart';
 import 'package:newsapp/News/news.dart';
 import 'package:newsapp/Watchlist/BSE_watchlist.dart';
+import 'package:newsapp/auth/createuser_page.dart';
+import 'package:newsapp/auth/usercontroller.dart';
 import 'package:newsapp/controllers/bse_controller.dart';
 import 'package:newsapp/controllers/nse_controller.dart';
 import 'package:newsapp/localdata/sharedpreferences.dart';
@@ -10,7 +12,8 @@ import 'package:newsapp/Stockslist/nse.dart';
 import 'package:newsapp/Watchlist/nse_watchlist.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final String email;
+  const HomePage({Key? key, required this.email}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -73,6 +76,52 @@ class _HomePageState extends State<HomePage> {
             ),
             backgroundColor: Colors.white,
             elevation: 1,
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text("Logout"),
+                            content:
+                                const Text("Are you sure you want to logout?"),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text("No")),
+                              TextButton(
+                                  onPressed: () {
+                                    UserController.logoutUser(widget.email)
+                                        .then((value) {
+                                      if (value == 'success') {
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const CreateUserPage()),
+                                            (route) => false);
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                                content:
+                                                    Text("Error logging out")));
+                                        Navigator.of(context).pop();
+                                      }
+                                    });
+                                  },
+                                  child: const Text("Yes")),
+                            ],
+                          );
+                        });
+                  },
+                  icon: const Icon(
+                    Icons.logout,
+                    color: Colors.black,
+                  ))
+            ],
             bottom: selectedindex == 0 || selectedindex == 2
                 ? const TabBar(
                     tabs: [
