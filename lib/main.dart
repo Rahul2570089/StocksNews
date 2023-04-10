@@ -13,7 +13,7 @@ Future main() async {
   await UserSimplePreferences.init();
   runApp(MaterialApp(
     home: ((UserSimplePreferences.getToken() == null ||
-                UserSimplePreferences.getToken() == '') &&
+                UserSimplePreferences.getToken() == '') ||
             JwtDecoder.isExpired(UserSimplePreferences.getToken()!))
         ? const CreateUserPage()
         : HomePage(token: UserSimplePreferences.getToken()!),

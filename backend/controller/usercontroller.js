@@ -4,7 +4,9 @@ exports.register = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const result = await UserService.createUser(email, password);
-        res.json({ status: true, success: "User created successfully" })
+        let tokenData = { id: user._id, email: user.email }
+        const token = await UserService.generateToken(tokenData, "process.env.JWT_SECRET", "1h");
+        res.json({ status: true, token: token, success: "User created successfully" })
     } catch (error) {
         throw error;
     }

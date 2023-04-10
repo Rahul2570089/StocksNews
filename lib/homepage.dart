@@ -37,8 +37,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(widget.token);
-    id = decodedToken['_id'];
+    if (widget.token != '') {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(widget.token);
+      id = decodedToken['_id'];
+    }
 
     l1 = UserSimplePreferences.getSymbol() ?? [];
     l2 = UserSimplePreferences.getColor() ?? [];
