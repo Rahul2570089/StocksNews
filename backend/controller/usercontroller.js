@@ -3,10 +3,13 @@ const UserService = require('../services/userservices');
 exports.register = async (req, res, next) => {
     try {
         const { email, password } = req.body;
+
+        const duplicate = await UserService.checkUser(email);
+        if (duplicate) {
+            throw new Error("User already exists");
+        }
         const result = await UserService.createUser(email, password);
-        let tokenData = { id: user._id, email: user.email }
-        const token = await UserService.generateToken(tokenData, "process.env.JWT_SECRET", "1h");
-        res.json({ status: true, token: token, success: "User created successfully" })
+        res.json({ status: true, success: "User created successfully" })
     } catch (error) {
         throw error;
     }
