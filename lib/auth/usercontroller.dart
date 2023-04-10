@@ -20,7 +20,7 @@ class UserController {
       var jsonResponse = jsonDecode(response.body.toString());
 
       if (jsonResponse['status']) {
-        UserSimplePreferences.setToken(jsonResponse['token']);
+        // UserSimplePreferences.setToken(jsonResponse['token']);
         return User(email, password);
       } else {
         return User(null, null);

@@ -38,7 +38,9 @@ class _NewsState extends State<News> {
           return Card(
             child: ListTile(
               title: Text(
-                news[position].title != null ? '${news[position].title}' : "No title available",
+                news[position].title != null
+                    ? '${news[position].title}'
+                    : "No title available",
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
@@ -51,18 +53,26 @@ class _NewsState extends State<News> {
                             'assets/images/unavailable.png',
                             fit: BoxFit.cover,
                           )
-                        : Image.network(
-                            '${news[position].urlimage}',
+                        : Image.network('${news[position].urlimage}',
                             fit: BoxFit.cover,
-                          ),
+                            errorBuilder: (context, error, stackTrace) {
+                            if (error.toString().contains('404')) {
+                              return Image.asset(
+                                'assets/images/unavailable.png',
+                                fit: BoxFit.cover,
+                              );
+                            }
+                            return Image.asset(
+                              'assets/images/unavailable.png',
+                              fit: BoxFit.cover,
+                            );
+                          }),
                     height: 100,
                     width: 100,
                   ),
                 ),
               ),
-              onTap: () => {
-                launchUrl(Uri.parse(news[position].url!))
-              },
+              onTap: () => {launchUrl(Uri.parse(news[position].url!))},
             ),
           );
         });
@@ -76,7 +86,9 @@ class _NewsState extends State<News> {
           return snapshot.data != null
               ? listview(snapshot.data!)
               : const Center(
-                  child: CircularProgressIndicator(color: Colors.black,),
+                  child: CircularProgressIndicator(
+                    color: Colors.black,
+                  ),
                 );
         });
   }
