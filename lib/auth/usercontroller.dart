@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:newsapp/Models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:newsapp/auth/config.dart';
+import 'package:newsapp/localdata/sharedpreferences.dart';
 
 class UserController {
   static Future<User> createUser(String email, String password) async {
@@ -19,6 +20,7 @@ class UserController {
       var jsonResponse = jsonDecode(response.body.toString());
 
       if (jsonResponse['status']) {
+        UserSimplePreferences.setToken(jsonResponse['token']);
         return User(email, password);
       } else {
         return User(null, null);
@@ -42,6 +44,7 @@ class UserController {
       var jsonResponse = jsonDecode(response.body.toString());
 
       if (jsonResponse['status']) {
+        UserSimplePreferences.setToken(jsonResponse['token']);
         return User(email, password);
       } else {
         return User(null, null);
@@ -51,22 +54,7 @@ class UserController {
     }
   }
 
-  static Future<String> logoutUser(String email) async {
-    try {
-      var user = {"email": email};
-      var response = await http.post(Uri.parse(logout),
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode(user));
-
-      var jsonResponse = jsonDecode(response.body.toString());
-
-      if (jsonResponse['status']) {
-        return 'success';
-      } else {
-        return 'fail';
-      }
-    } catch (e) {
-      return 'fail';
-    }
+  static void logoutUser(String email) {
+    UserSimplePreferences.setToken('');
   }
 }

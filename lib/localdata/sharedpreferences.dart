@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserSimplePreferences {
   static SharedPreferences? _preferences;
 
+  static const _tokenkey = 'token';
   static const _keyS = 'watchlistsymbol';
   static const _keyC = 'watchlistcolor';
   static const _keyS1 = 'watchlistsymbol1';
@@ -15,6 +16,14 @@ class UserSimplePreferences {
 
   static Future init() async {
     _preferences = await SharedPreferences.getInstance();
+  }
+
+  static Future setToken(String token) async {
+    await _preferences?.setString(_tokenkey, token);
+  }
+
+  static String? getToken() {
+    return _preferences?.getString(_tokenkey);
   }
 
   static Future setSymbol(RxList<String> s) async {

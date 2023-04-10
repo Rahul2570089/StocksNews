@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:newsapp/Stockslist/bse.dart';
 import 'package:newsapp/News/news.dart';
 import 'package:newsapp/Watchlist/BSE_watchlist.dart';
@@ -12,8 +13,8 @@ import 'package:newsapp/Stockslist/nse.dart';
 import 'package:newsapp/Watchlist/nse_watchlist.dart';
 
 class HomePage extends StatefulWidget {
-  final String email;
-  const HomePage({Key? key, required this.email}) : super(key: key);
+  final String token;
+  const HomePage({Key? key, required this.token}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -27,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     const Watchlist(),
   ];
 
+  String? id;
   List<String>? l1, l2, l3, l4;
   NSEcontroller nsecontroller = Get.put(NSEcontroller());
   BSEcontroller bsecontroller = Get.put(BSEcontroller());
@@ -34,6 +36,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(widget.token);
+    id = decodedToken['_id'];
+
     l1 = UserSimplePreferences.getSymbol() ?? [];
     l2 = UserSimplePreferences.getColor() ?? [];
     l3 = UserSimplePreferences.getSymbol1() ?? [];
@@ -94,23 +100,13 @@ class _HomePageState extends State<HomePage> {
                                   child: const Text("No")),
                               TextButton(
                                   onPressed: () {
-                                    UserController.logoutUser(widget.email)
-                                        .then((value) {
-                                      if (value == 'success') {
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const CreateUserPage()),
-                                            (route) => false);
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(const SnackBar(
-                                                content:
-                                                    Text("Error logging out")));
-                                        Navigator.of(context).pop();
-                                      }
-                                    });
+                                    UserController.logoutUser(widget.token);
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CreateUserPage()),
+                                        (route) => false);
                                   },
                                   child: const Text("Yes")),
                             ],

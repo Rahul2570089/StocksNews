@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:newsapp/auth/loginuser_page.dart';
 import 'package:newsapp/auth/usercontroller.dart';
 import 'package:newsapp/homepage.dart';
+import 'package:newsapp/localdata/sharedpreferences.dart';
 
 class CreateUserPage extends StatefulWidget {
   const CreateUserPage({Key? key}) : super(key: key);
@@ -96,7 +97,8 @@ class _CreateUserPageState extends State<CreateUserPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => HomePage(
-                                          email: emailController.text)));
+                                          token: UserSimplePreferences
+                                              .getToken()!)));
                               setState(
                                 () => isLoading = false,
                               );

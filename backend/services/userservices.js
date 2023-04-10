@@ -27,14 +27,6 @@ class UserService {
             throw error;
         }
     }
-
-    static async deleteToken(email ,token) {
-        try {
-            return await UserModel.findByIdAndUpdate(email, { $set: { token: token } })
-        } catch (error) {
-            throw error;
-        }
-    }
 }
 
 module.exports = UserService;

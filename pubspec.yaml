@@ -38,9 +38,10 @@ dependencies:
   url_launcher: ^6.1.2
   marquee: ^2.2.2
   fluttertoast: ^8.0.9
-  shared_preferences: ^2.0.15
+  shared_preferences: ^2.1.0
   get: ^4.6.5
   syncfusion_flutter_charts: ^21.1.37
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:

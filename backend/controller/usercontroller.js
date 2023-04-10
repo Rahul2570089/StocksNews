@@ -34,25 +34,3 @@ exports.login = async (req, res, next) => {
         throw error;
     }
 }
-
-exports.logout = async (req, res, next) => {
-    try {
-        const { email } = req.body;
-        if (req.headers && req.headers.authorization) {
-            const token = req.headers.authorization.split(' ')[1];
-
-            if (!token) {
-                res.json({ status: false, error: "Token not found" })
-            }
-
-            const tokens = req.user.tokens;
-
-            const newTokens = tokens.filter((t) => t !== token);
-
-            const result = await UserService.deleteToken(email, newTokens);
-            res.json({ status: true, success: "User logged out successfully" })
-        }
-    } catch (error) {
-        throw error;
-    }
-}

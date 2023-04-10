@@ -12,9 +12,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    tokens: [{
-        type: Object
-    }]
 })
 
 UserSchema.pre('save', async function () {
